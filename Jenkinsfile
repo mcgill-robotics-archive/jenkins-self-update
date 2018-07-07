@@ -20,7 +20,7 @@ pipeline {
         set -e
 
         UPDATE_LIST="$(
-          java -jar jenkins-cli.jar -s ${JENKINS_URL} list-plugins |
+          java -jar jenkins-cli.jar -s ${JENKINS_URL} list-plugins --username ${USERNAME} --password-file ${PAT_FILE} |
             grep ')$' |
             cut -d' ' -f1 |
             tr '\n' ' '
