@@ -2,8 +2,8 @@ pipeline {
   agent any
   environment {
     JENKINS_URL = "http://127.0.0.1:8080"
-    USERNAME = "mcgillrobotics"
-    PAT_FILE = "/home/jenkins/pat_file"
+    JENKINS_USER_ID = "mcgillrobotics"
+    JENKINS_API_TOKEN = credentials("jenkins-api-token")
   }
   triggers {
     cron('0 8 * * *')
@@ -20,15 +20,15 @@ pipeline {
         set -e
 
         UPDATE_LIST="$(
-          java -jar jenkins-cli.jar -s ${JENKINS_URL} list-plugins --username ${USERNAME} --password-file ${PAT_FILE} |
+          java -jar jenkins-cli.jar list-plugins |
             grep ')$' |
             cut -d' ' -f1 |
             tr '\n' ' '
         )"
 
         if [ ! -z "${UPDATE_LIST// }" ]; then
-          java -jar jenkins-cli.jar -s ${JENKINS_URL} install-plugin ${UPDATE_LIST} --username ${USERNAME} --password-file ${PAT_FILE}
-          java -jar jenkins-cli.jar -s ${JENKINS_URL} safe-restart --username ${USERNAME} --password-file ${PAT_FILE}
+          java -jar jenkins-cli.jar install-plugin ${UPDATE_LIST}
+          java -jar jenkins-cli.jar safe-restart
         else
           echo "No updates available"
         fi
